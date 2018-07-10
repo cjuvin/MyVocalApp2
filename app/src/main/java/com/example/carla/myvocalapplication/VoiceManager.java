@@ -175,16 +175,6 @@ public class VoiceManager implements VoiceBaseManager{
         speechRecognizer.stopListening();
     }
 
-    @Override
-    public void shutdown() {
-        if (textToSpeech != null) {
-            textToSpeech.shutdown();
-        }
-
-        if (speechRecognizer != null) {
-            speechRecognizer.destroy();
-        }
-    }
 
 
     private UtteranceProgressListener utteranceProgressListener = new UtteranceProgressListener() {
