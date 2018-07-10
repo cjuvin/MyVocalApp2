@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">MyVocalApplication</string>
+    <string name="speak">Speak Button</string>
+    <string name="consignes">Say I need or add, to add an item to your shopping list or say read or what\'s in my list to read the list</string>
+    <string name="AddContact">Add contact</string>
+    <string name="Directory">Directory</string>
 </resources>

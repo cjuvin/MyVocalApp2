@@ -1,7 +1,7 @@
 package com.example.carla.myvocalapplication;
 
+import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
-import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.speech.RecognizerIntent;
@@ -15,12 +15,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -29,8 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import static com.example.carla.myvocalapplication.MainActivity.REQUEST_CODE_CHOOSE_ACTIVITY;
-import static com.example.carla.myvocalapplication.MainActivity.REQUEST_CODE_CONTACT;
 import static com.example.carla.myvocalapplication.MainActivity.REQUEST_CODE_NO_LISTENING;
 import static com.example.carla.myvocalapplication.MainActivity.REQUEST_CODE_Shoplist;
 import static com.example.carla.myvocalapplication.MainActivity.REQ_CODE;
@@ -40,9 +35,7 @@ import static com.example.carla.myvocalapplication.MainActivity.REQ_CODE;
 public class Shoplist extends AppCompatActivity  implements VoiceManager.VoiceManagerListener{
     private static final int REQ_CODE_SPEECH_INPUT = 100;
     private ListView mVoiceInputTv;
-    private ImageButton mSpeakBtn;
     private String LIST="list.txt";
-    private FileOutputStream out=null;
     private FileInputStream in=null;
     private ArrayList<Item> _data;
     ArrayList<String> result;
@@ -57,7 +50,7 @@ public class Shoplist extends AppCompatActivity  implements VoiceManager.VoiceMa
         String name;
         Boolean Strike;
 
-        public Item (String name, Boolean strike)
+        private Item (String name, Boolean strike)
         {
             this.name = name;
             this.Strike=strike;
@@ -71,11 +64,11 @@ public class Shoplist extends AppCompatActivity  implements VoiceManager.VoiceMa
         setContentView(R.layout.activity_shoplist);
 
 
-        mVoiceInputTv = (ListView) findViewById(R.id.voiceInput);
-        _data = new ArrayList<Item>();
+        mVoiceInputTv =  findViewById(R.id.voiceInput);
+        _data = new ArrayList<>();
         adaptater = new MyListAdaptater(this,R.layout.list, _data);
 
-        mSpeakBtn = (ImageButton) findViewById(R.id.btnSpeak);
+        ImageButton mSpeakBtn = findViewById(R.id.btnSpeak);
 
         voiceManager = new VoiceManager(this);
         voiceManager.setVoiceManagerListener(this);
@@ -85,26 +78,20 @@ public class Shoplist extends AppCompatActivity  implements VoiceManager.VoiceMa
 
 
 
-        mSpeakBtn.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                startVoiceInput();
-            }
-        });
+        mSpeakBtn.setOnClickListener(v -> startVoiceInput());
     }
 
 
 
     private void startVoiceInput() {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        //intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.UK);
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "What item do you want to add?");
         try {
             startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
         } catch (ActivityNotFoundException a) {
-
+            Log.i("",a.getMessage());
         }
     }
 
@@ -133,11 +120,8 @@ public class Shoplist extends AppCompatActivity  implements VoiceManager.VoiceMa
         try {
             FileInputStream input = openFileInput(LIST);
             int value;
-            // On utilise un StringBuffer pour construire la chaîne au fur et à mesure
             StringBuilder lu = new StringBuilder();
-            // On lit les caractères les uns après les autres
             while ((value = input.read()) != -1) {
-                // On écrit dans le fichier le caractère lu
                 lu.append((char) value);
             }
 
@@ -146,8 +130,8 @@ public class Shoplist extends AppCompatActivity  implements VoiceManager.VoiceMa
 
             String[] strRead = lu.toString().split(",");
 
-                for (int i = 0; i < strRead.length; i++) {
-                    String[] item = strRead[i].split(":");
+                for (String s : strRead){
+                    String[] item = s.split(":");
                     Item it  = new Item(item[0],Boolean.valueOf(item[1]));
                     _data.add(it);
                 }
@@ -161,13 +145,10 @@ public class Shoplist extends AppCompatActivity  implements VoiceManager.VoiceMa
             e.printStackTrace();
         }
 
-        toSpeech= new TextToSpeech(this, new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if (status==TextToSpeech.SUCCESS)
-                {
-                    toSpeech.setLanguage(Locale.UK);
-                }
+        toSpeech= new TextToSpeech(this, status -> {
+            if (status==TextToSpeech.SUCCESS)
+            {
+                toSpeech.setLanguage(Locale.UK);
             }
         });
     }
@@ -224,32 +205,29 @@ public class Shoplist extends AppCompatActivity  implements VoiceManager.VoiceMa
 
         }
 
+        @SuppressLint("ViewHolder")
+        @NonNull
         @Override
         public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             LayoutInflater inflater = LayoutInflater.from(getContext());
-            View v = inflater.inflate(layout, parent, false);
+            @SuppressLint("ViewHolder") View v;
+            v = inflater.inflate(layout, parent, false);
 
             String str = l.get(position).name;
-            ImageButton delete = (ImageButton) v.findViewById(R.id.buttonDelete);
+            ImageButton delete =  v.findViewById(R.id.buttonDelete);
             TextView item =  v.findViewById(R.id.text);
             item.setText(str);
             if (l.get(position).Strike)
                 item.getPaint().setStrikeThruText(true);
 
-            delete.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    l.remove(position);
-                    mVoiceInputTv.setAdapter(adaptater);
-                }
+            delete.setOnClickListener(v1 -> {
+                l.remove(position);
+                mVoiceInputTv.setAdapter(adaptater);
             });
-            item.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    l.get(position).Strike=!l.get(position).Strike;
-                    mVoiceInputTv.setAdapter(adaptater);
+            item.setOnClickListener(v12 -> {
+                l.get(position).Strike=!l.get(position).Strike;
+                mVoiceInputTv.setAdapter(adaptater);
 
-                }
             });
             return v;
         }
@@ -260,15 +238,15 @@ public class Shoplist extends AppCompatActivity  implements VoiceManager.VoiceMa
     protected void onStop() {
         super.onStop();
         try {
-            out= openFileOutput(LIST, MODE_PRIVATE);
-            String str = "";
+            FileOutputStream out = openFileOutput(LIST, MODE_PRIVATE);
+            StringBuilder str= new StringBuilder() ;
             for (Item i : _data
-                 ) {str = str + i.name +":"+ i.Strike.toString()+ ",";
+                 ) {
+                str.append(i.name).append(":").append(i.Strike.toString()).append(",");
 
             }
-            out.write(str.getBytes());
-            if (out != null)
-                out.close();
+            out.write(str.toString().getBytes());
+            out.close();
         }catch (FileNotFoundException e ) {e.printStackTrace();} catch (IOException e ){e.printStackTrace();}
         _data.clear();
 

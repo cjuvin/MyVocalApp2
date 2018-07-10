@@ -8,8 +8,6 @@ public interface VoiceBaseManager {
 
         void listen(int requestCode);
 
-        void shutdown();
-
         void setVoiceManagerListener(VoiceManager.VoiceManagerListener listener);
 
 }

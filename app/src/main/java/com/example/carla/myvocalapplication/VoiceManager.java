@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 
-import static com.example.carla.myvocalapplication.MainActivity.REQUEST_CODE_NO_LISTENING;
 
 public class VoiceManager implements VoiceBaseManager{
     private Activity activity;
@@ -40,10 +39,76 @@ public class VoiceManager implements VoiceBaseManager{
     }
 
 
-    public VoiceManager(Activity activity) {
+    VoiceManager(Activity activity) {
 
         this.activity = activity;
         this.speechRecognizer = SpeechRecognizer.createSpeechRecognizer(activity);
+        RecognitionListener recognitionListener = new RecognitionListener() {
+            @Override
+            public void onReadyForSpeech(Bundle bundle) {
+
+            }
+
+            @Override
+            public void onBeginningOfSpeech() {
+
+                Log.i("VOICE", "VoiceManager onBeginofSpeech");
+
+            }
+
+            @Override
+            public void onRmsChanged(float v) {
+
+            }
+
+            @Override
+            public void onBufferReceived(byte[] bytes) {
+
+            }
+
+            @Override
+            public void onEndOfSpeech() {
+
+                Log.i("VOICE", "VoiceManager onEndOfSpeech");
+
+            }
+
+            @Override
+            public void onError(int errorCode) {
+
+                Log.i("VOICE", "VoiceManager onError" + errorCode);
+
+                if ((errorCode == SpeechRecognizer.ERROR_NO_MATCH) || (errorCode == SpeechRecognizer.ERROR_SPEECH_TIMEOUT)) {
+
+                    listen(lastListeningType);
+                }
+            }
+
+            @Override
+            public void onResults(Bundle bundle) {
+
+                Log.i("VOICE", "VoiceManager onResults");
+
+                ArrayList<String> results;
+                results = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+                if (results != null)
+                    string = results.get(0);
+
+                Log.i("VOICE", string);
+
+                voiceManagerListener.onResults(results, lastListeningType);
+            }
+
+            @Override
+            public void onPartialResults(Bundle bundle) {
+
+            }
+
+            @Override
+            public void onEvent(int i, Bundle bundle) {
+
+            }
+        };
         this.speechRecognizer.setRecognitionListener(recognitionListener);
 
         speechIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -122,74 +187,7 @@ public class VoiceManager implements VoiceBaseManager{
     }
 
 
-    RecognitionListener recognitionListener = new RecognitionListener() {
-        @Override
-        public void onReadyForSpeech(Bundle bundle) {
-
-        }
-
-        @Override
-        public void onBeginningOfSpeech() {
-
-            Log.i("VOICE", "VoiceManager onBeginofSpeech");
-
-        }
-
-        @Override
-        public void onRmsChanged(float v) {
-
-        }
-
-        @Override
-        public void onBufferReceived(byte[] bytes) {
-
-        }
-
-        @Override
-        public void onEndOfSpeech() {
-
-            Log.i("VOICE", "VoiceManager onEndOfSpeech");
-
-        }
-
-        @Override
-        public void onError(int errorCode) {
-
-            Log.i("VOICE", "VoiceManager onError" + errorCode);
-
-            if ((errorCode == SpeechRecognizer.ERROR_NO_MATCH) || (errorCode == SpeechRecognizer.ERROR_SPEECH_TIMEOUT)) {
-
-                listen(lastListeningType);
-            }
-        }
-
-        @Override
-        public void onResults(Bundle bundle) {
-
-            Log.i("VOICE", "VoiceManager onResults");
-
-            ArrayList<String> results = new ArrayList<>();
-            results=bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-            string = results.get(0);
-
-            Log.i("VOICE", string );
-
-            voiceManagerListener.onResults(results, lastListeningType);
-        }
-
-        @Override
-        public void onPartialResults(Bundle bundle) {
-
-        }
-
-        @Override
-        public void onEvent(int i, Bundle bundle) {
-
-        }
-    };
-
-
-    UtteranceProgressListener utteranceProgressListener = new UtteranceProgressListener() {
+    private UtteranceProgressListener utteranceProgressListener = new UtteranceProgressListener() {
         @Override
         public void onStart(String s) {
 

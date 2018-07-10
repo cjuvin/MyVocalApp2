@@ -28,17 +28,17 @@
             android:layout_height="wrap_content"
             android:background="@null"
             android:scaleType="fitCenter"
-            app:srcCompat="@android:drawable/ic_btn_speak_now" />
-        />
+            app:srcCompat="@android:drawable/ic_btn_speak_now"
+            />
+
 
         <TextView
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/btnSpeak"
             android:layout_gravity="center"
-            android:text="Say I need or add, to add an item to your shopping list or say read or what's in my list to read the list."
-            />
+            android:text="@string/consignes"
+            android:contentDescription="@string/speak"/>
     </LinearLayout>
 
 

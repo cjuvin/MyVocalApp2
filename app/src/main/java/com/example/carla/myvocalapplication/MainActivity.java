@@ -1,26 +1,18 @@
 package com.example.carla.myvocalapplication;
 
 import android.Manifest;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.media.MediaSync;
 import android.os.Build;
-import android.speech.RecognizerIntent;
-import android.speech.tts.UtteranceProgressListener;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import java.util.ArrayList;
-import java.util.Locale;
+
 
 public class MainActivity extends AppCompatActivity implements VoiceManager.VoiceManagerListener {
     public final static int REQUEST_CODE_CHOOSE_ACTIVITY= 1;
@@ -37,25 +29,21 @@ public class MainActivity extends AppCompatActivity implements VoiceManager.Voic
     private String _strRepete = "I didn't understand. Please repeat. ";
     private String _strList = "Shop List ";
     private String _strDir = "Directory";
-    private TextView textView;
-    private TextView shopButton;
-    private TextView DirButton;
-
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        textView = (TextView) findViewById(R.id.txt);
-        shopButton = (TextView)findViewById(R.id.shopTxt);
-        DirButton = (TextView) findViewById(R.id.directoryTxt);
+        TextView textView = findViewById(R.id.txt);
+        TextView shopButton =  findViewById(R.id.shopTxt);
+        TextView dirButton =  findViewById(R.id.directoryTxt);
         voiceManager = new VoiceManager(this);
         voiceManager.setVoiceManagerListener(this);
 
         textView.setText(_strChooseAct);
         shopButton.setText(_strList);
-        DirButton.setText(_strDir);
+        dirButton.setText(_strDir);
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)!= PackageManager.PERMISSION_GRANTED)
         {
